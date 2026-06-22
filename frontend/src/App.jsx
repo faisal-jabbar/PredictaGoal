@@ -2,18 +2,28 @@ import { useState, useEffect } from 'react'
 import { Activity, Database, Brain, Target, Calendar, Layers, Wifi, WifiOff } from 'lucide-react'
 
 import * as api from './api/client.js'
-import KpiCard            from './components/KpiCard.jsx'
-import PredictionCard     from './components/PredictionCard.jsx'
-import ConfidenceGauge    from './components/ConfidenceGauge.jsx'
-import ExplanationPanel   from './components/ExplanationPanel.jsx'
+import KpiCard              from './components/KpiCard.jsx'
+import PredictionCard       from './components/PredictionCard.jsx'
+import ConfidenceGauge      from './components/ConfidenceGauge.jsx'
+import ExplanationPanel     from './components/ExplanationPanel.jsx'
 import FeatureImportanceChart from './components/FeatureImportanceChart.jsx'
-import DatasetSummary     from './components/DatasetSummary.jsx'
-import ModelSummary       from './components/ModelSummary.jsx'
-import DriftReportPanel   from './components/DriftReportPanel.jsx'
-import BiasReportPanel    from './components/BiasReportPanel.jsx'
-import ContextualPanel    from './components/ContextualPanel.jsx'
-import LoadingState       from './components/LoadingState.jsx'
-import ErrorState         from './components/ErrorState.jsx'
+import DatasetSummary       from './components/DatasetSummary.jsx'
+import ModelSummary         from './components/ModelSummary.jsx'
+import DriftReportPanel     from './components/DriftReportPanel.jsx'
+import BiasReportPanel      from './components/BiasReportPanel.jsx'
+import ContextualPanel      from './components/ContextualPanel.jsx'
+import LoadingState         from './components/LoadingState.jsx'
+import ErrorState           from './components/ErrorState.jsx'
+// Phase 03 panels
+import SystemHealthPanel    from './components/SystemHealthPanel.jsx'
+import ModelVersionPanel    from './components/ModelVersionPanel.jsx'
+import RetrainingPanel      from './components/RetrainingPanel.jsx'
+import ProviderStatusPanel  from './components/ProviderStatusPanel.jsx'
+import AgentQueryPanel      from './components/AgentQueryPanel.jsx'
+import CustomPredictionPanel from './components/CustomPredictionPanel.jsx'
+import AuditTrailPanel      from './components/AuditTrailPanel.jsx'
+import AlertsPanel          from './components/AlertsPanel.jsx'
+import OrchestrationPanel   from './components/OrchestrationPanel.jsx'
 
 function useAsync(fn, deps = []) {
   const [state, setState] = useState({ data: null, loading: true, error: null })
@@ -21,11 +31,12 @@ function useAsync(fn, deps = []) {
     setState(s => ({ ...s, loading: true, error: null }))
     fn().then(data => setState({ data, loading: false, error: null }))
        .catch(err  => setState({ data: null, loading: false, error: err.message }))
-  }, deps)
+  }, deps) // eslint-disable-line react-hooks/exhaustive-deps
   return state
 }
 
 export default function App() {
+  // ── Phase 01 / 02 data ────────────────────────────────────
   const health      = useAsync(api.fetchHealth)
   const summary     = useAsync(api.fetchSummary)
   const prediction  = useAsync(api.fetchPrediction)
@@ -37,11 +48,19 @@ export default function App() {
   const bias        = useAsync(api.fetchBias)
   const contextual  = useAsync(api.fetchContextual)
 
+  // ── Phase 03 data ─────────────────────────────────────────
+  const systemStatus   = useAsync(api.fetchSystemStatus)
+  const providers      = useAsync(api.fetchProviders)
+  const retraining     = useAsync(api.fetchRetraining)
+  const modelVersion   = useAsync(api.fetchModelVersion)
+  const auditRecent    = useAsync(api.fetchAuditRecent)
+  const alertsRecent   = useAsync(api.fetchAlertsRecent)
+
   const apiOnline = !health.error
   const fbStatus  = health.data?.firebase || 'unknown'
   const now       = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
 
-  const s = summary.data || {}
+  const s = summary.data    || {}
   const p = prediction.data || {}
 
   return (
@@ -57,15 +76,13 @@ export default function App() {
             </div>
           </div>
           <div className="hidden sm:flex items-center gap-2 flex-wrap justify-end">
-            <span className="badge-blue text-xs">Phase 02 Intelligence Dashboard</span>
+            <span className="badge-blue text-xs">Phase 03 Production Agent</span>
             {apiOnline
               ? <span className="badge-green"><Wifi className="w-3 h-3" />API Online</span>
-              : <span className="badge-red"><WifiOff className="w-3 h-3" />API Offline</span>
-            }
+              : <span className="badge-red"><WifiOff className="w-3 h-3" />API Offline</span>}
             {fbStatus.includes('connected')
-              ? <span className="badge-green">Firestore Connected</span>
-              : <span className="badge-amber">Local Fallback</span>
-            }
+              ? <span className="badge-green">Firestore</span>
+              : <span className="badge-amber">Local Fallback</span>}
             <span className="text-xs text-slate-600">{now}</span>
           </div>
         </div>
@@ -75,7 +92,10 @@ export default function App() {
 
         {!apiOnline && (
           <div className="bg-danger-500/10 border border-danger-500/30 rounded-xl p-4 text-sm text-danger-300">
-            <strong>Backend offline.</strong> Start with: <code className="font-mono text-xs bg-navy-900 px-2 py-0.5 rounded">uvicorn src.api.main:app --reload</code>
+            <strong>Backend offline.</strong> Start with:{' '}
+            <code className="font-mono text-xs bg-navy-900 px-2 py-0.5 rounded">
+              python -m uvicorn src.api.main:app --reload
+            </code>
           </div>
         )}
 
@@ -83,24 +103,27 @@ export default function App() {
         <section>
           <p className="label mb-4">System Overview</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <KpiCard title="Total Matches"    value={s.dataset_rows?.toLocaleString()} subtitle="Raw dataset rows"      icon={Database} accent="blue"  />
-            <KpiCard title="After Cleaning"   value={s.cleaned_rows?.toLocaleString()} subtitle="Usable for training"   icon={Database} accent="green" />
-            <KpiCard title="Model Accuracy"   value={s.model_accuracy ? `${(s.model_accuracy*100).toFixed(1)}%` : '—'} subtitle="Time-based test split" icon={Brain}  accent="green" />
-            <KpiCard title="Features"         value={s.features_count ?? 14}           subtitle="Engineered signals"    icon={Layers}  accent="blue"  />
-            <KpiCard title="Data From"        value={s.date_range_from}                subtitle="Dataset start"         icon={Calendar} accent="slate" />
-            <KpiCard title="Prediction"       value={p.prediction?.replace('_',' ')?.replace(/\b\w/g,c=>c.toUpperCase())} subtitle={`${p.home_team} vs ${p.away_team}`} icon={Target} accent="amber" />
+            <KpiCard title="Total Matches"  value={s.dataset_rows?.toLocaleString()} subtitle="Raw dataset rows"      icon={Database} accent="blue"  />
+            <KpiCard title="After Cleaning" value={s.cleaned_rows?.toLocaleString()} subtitle="Usable for training"   icon={Database} accent="green" />
+            <KpiCard title="Model Accuracy" value={s.model_accuracy ? `${(s.model_accuracy*100).toFixed(1)}%` : '—'} subtitle="Test-set accuracy" icon={Brain} accent="green" />
+            <KpiCard title="Features"       value={s.features_count ?? 14}           subtitle="Engineered signals"    icon={Layers}   accent="blue"  />
+            <KpiCard title="Data From"      value={s.date_range_from}                subtitle="Dataset start"         icon={Calendar} accent="slate" />
+            <KpiCard title="Prediction"
+              value={p.prediction?.replace('_',' ')?.replace(/\b\w/g,c=>c.toUpperCase())}
+              subtitle={p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : 'Sample prediction'}
+              icon={Target} accent="amber" />
           </div>
         </section>
 
         {/* ── PREDICTION + CONFIDENCE ── */}
         <section className="grid lg:grid-cols-2 gap-6">
           <div>
-            {prediction.loading ? <LoadingState label="Loading prediction..." /> :
+            {prediction.loading ? <LoadingState label="Loading prediction…" /> :
              prediction.error   ? <ErrorState message="Prediction unavailable." hint="Is the backend running?" /> :
              <PredictionCard prediction={prediction.data} />}
           </div>
           <div>
-            {confidence.loading ? <LoadingState label="Loading confidence..." /> :
+            {confidence.loading ? <LoadingState label="Loading confidence…" /> :
              confidence.error   ? <ErrorState message="Confidence report unavailable." hint="Run scripts/10_calculate_confidence.py" /> :
              <ConfidenceGauge data={confidence.data} />}
           </div>
@@ -109,7 +132,7 @@ export default function App() {
         {/* ── EXPLANATION + FEATURE IMPORTANCE ── */}
         <section className="grid lg:grid-cols-2 gap-6">
           <div>
-            {explanation.loading ? <LoadingState label="Loading explanation..." /> :
+            {explanation.loading ? <LoadingState label="Loading explanation…" /> :
              explanation.error   ? <ErrorState message="Explanation unavailable." hint="Run scripts/09_generate_explanations.py" /> :
              <ExplanationPanel data={explanation.data} />}
           </div>
@@ -123,12 +146,12 @@ export default function App() {
         {/* ── DATASET + MODEL ── */}
         <section className="grid lg:grid-cols-2 gap-6">
           <div>
-            {dataset.loading ? <LoadingState label="Loading dataset report..." /> :
+            {dataset.loading ? <LoadingState label="Loading dataset report…" /> :
              dataset.error   ? <ErrorState message="Dataset report unavailable." hint="Run scripts/05_preprocess_data.py" /> :
              <DatasetSummary dataset={dataset.data} summary={summary.data} />}
           </div>
           <div>
-            {model.loading  ? <LoadingState label="Loading model report..." /> :
+            {model.loading  ? <LoadingState label="Loading model report…" /> :
              model.error    ? <ErrorState message="Model report unavailable." hint="Run scripts/07_train_model.py" /> :
              <ModelSummary model={model.data} />}
           </div>
@@ -137,12 +160,12 @@ export default function App() {
         {/* ── DRIFT + BIAS ── */}
         <section className="grid lg:grid-cols-2 gap-6">
           <div>
-            {drift.loading  ? <LoadingState label="Loading drift report..." /> :
+            {drift.loading  ? <LoadingState label="Loading drift report…" /> :
              drift.error    ? <ErrorState message="Drift report unavailable." hint="Run scripts/11_generate_drift_report.py" /> :
              <DriftReportPanel data={drift.data} />}
           </div>
           <div>
-            {bias.loading   ? <LoadingState label="Loading bias report..." /> :
+            {bias.loading   ? <LoadingState label="Loading bias report…" /> :
              bias.error     ? <ErrorState message="Bias report unavailable." hint="Run scripts/12_generate_bias_report.py" /> :
              <BiasReportPanel data={bias.data} />}
           </div>
@@ -150,16 +173,78 @@ export default function App() {
 
         {/* ── CONTEXTUAL ── */}
         <section>
-          {contextual.loading ? <LoadingState label="Loading contextual data..." /> :
-           contextual.error   ? <ErrorState message="Contextual report unavailable." hint="Run scripts/09_generate_explanations.py (generates contextual report too)" /> :
+          {contextual.loading ? <LoadingState label="Loading contextual data…" /> :
+           contextual.error   ? <ErrorState message="Contextual report unavailable." hint="Run scripts/09_generate_explanations.py" /> :
            <ContextualPanel data={contextual.data} />}
+        </section>
+
+        {/* ════════════════════════════════════════════════════════
+            PHASE 03 — PRODUCTION AGENT DASHBOARD
+            ════════════════════════════════════════════════════════ */}
+        <div className="border-t border-slate-700/40 pt-2">
+          <div className="flex items-center gap-3 mb-6">
+            <Activity className="w-5 h-5 text-pitch-400" />
+            <h2 className="text-xl font-bold text-white">Production Agent</h2>
+            <span className="badge-green">Phase 03</span>
+          </div>
+        </div>
+
+        {/* ── SYSTEM HEALTH + MODEL VERSION ── */}
+        <section className="grid lg:grid-cols-2 gap-6">
+          <SystemHealthPanel
+            data={systemStatus.data}
+            loading={systemStatus.loading}
+            error={systemStatus.error} />
+          <ModelVersionPanel
+            data={modelVersion.data}
+            loading={modelVersion.loading}
+            error={modelVersion.error} />
+        </section>
+
+        {/* ── RETRAINING + PROVIDER STATUS ── */}
+        <section className="grid lg:grid-cols-2 gap-6">
+          <RetrainingPanel
+            data={retraining.data}
+            loading={retraining.loading}
+            error={retraining.error} />
+          <ProviderStatusPanel
+            data={providers.data}
+            loading={providers.loading}
+            error={providers.error} />
+        </section>
+
+        {/* ── AGENT QUERY (full width) ── */}
+        <section>
+          <AgentQueryPanel />
+        </section>
+
+        {/* ── CUSTOM PREDICTION (full width) ── */}
+        <section>
+          <CustomPredictionPanel />
+        </section>
+
+        {/* ── AUDIT TRAIL + ALERTS ── */}
+        <section className="grid lg:grid-cols-2 gap-6">
+          <AuditTrailPanel
+            data={auditRecent.data}
+            loading={auditRecent.loading}
+            error={auditRecent.error} />
+          <AlertsPanel
+            data={alertsRecent.data}
+            loading={alertsRecent.loading}
+            error={alertsRecent.error} />
+        </section>
+
+        {/* ── ORCHESTRATION + MONITORING LINKS (full width) ── */}
+        <section>
+          <OrchestrationPanel />
         </section>
 
         {/* ── FOOTER ── */}
         <footer className="border-t border-slate-700/40 pt-6 text-center">
           <p className="text-xs text-slate-600">
-            PredictaGoal — Phase 02 Intelligence Dashboard · Built with React + FastAPI + Firebase ·
-            For analytical purposes only · Not financial or betting advice
+            PredictaGoal v1.0.0 · Phase 03 Production Agent · React + FastAPI + Firebase + MLflow ·
+            For analytical purposes only · Not financial advice
           </p>
         </footer>
       </main>
