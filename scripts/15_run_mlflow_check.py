@@ -43,7 +43,9 @@ def run_mlflow_check():
         sys.exit(1)
 
     report = json.loads(model_report_path.read_text())
-    print(f"  {PASS} Model report loaded  (accuracy={report.get('test_accuracy', '?')})")
+    # Key is "accuracy" in Phase 01 training report; "test_accuracy" is a legacy alias
+    _acc = report.get("accuracy") or report.get("test_accuracy")
+    print(f"  {PASS} Model report loaded  (accuracy={_acc})")
 
     # 4. Load trained model artifact
     model_path = ROOT / "models" / "artifacts" / "football_match_model.joblib"
@@ -75,6 +77,7 @@ def run_mlflow_check():
 
     cm = report.get("confusion_matrix_list") or []
 
+    accuracy = report.get("accuracy") or report.get("test_accuracy") or 0.0
     run_id = log_training_run(
         model=model,
         params={
@@ -84,7 +87,7 @@ def run_mlflow_check():
             "test_size":    report.get("test_size", 0),
         },
         metrics={
-            "test_accuracy":  report.get("test_accuracy", 0.0),
+            "test_accuracy":  accuracy,
             "train_accuracy": report.get("train_accuracy", 0.0),
             "n_features":     float(len(feat_cols)),
         },
@@ -103,7 +106,7 @@ def run_mlflow_check():
     draw_f1 = bias_rpt.get("accuracy_by_class", {}).get("draw", 0.30)
 
     version = write_version_record(
-        accuracy=report.get("test_accuracy", 0.0),
+        accuracy=accuracy,
         draw_f1=float(draw_f1),
         feature_columns=feat_cols,
         artifact_path=str(model_path),

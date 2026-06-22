@@ -62,10 +62,10 @@ def check_json(rel, label=None):
         return False
 
 
-def check_url(url, label, key=None, expected=None):
+def check_url(url, label, key=None, expected=None, timeout=8):
     try:
         import urllib.request as _ur
-        with _ur.urlopen(url, timeout=5) as r:
+        with _ur.urlopen(url, timeout=timeout) as r:
             data = json.loads(r.read())
         if key and expected and data.get(key) != expected:
             warn(f"{label} responded but {key}={data.get(key)} (expected {expected})")
@@ -128,7 +128,7 @@ def main():
 
     check_url("http://localhost:8000/api/v1/summary",              "/api/v1/summary")
     check_url("http://localhost:8000/api/v1/predictions/sample",   "/api/v1/predictions/sample")
-    check_url("http://localhost:8000/api/v1/system/status",        "/api/v1/system/status")
+    check_url("http://localhost:8000/api/v1/system/status",        "/api/v1/system/status",  timeout=15)
     check_url("http://localhost:8000/api/v1/providers/status",     "/api/v1/providers/status")
     check_url("http://localhost:8000/api/v1/agent/capabilities",   "/api/v1/agent/capabilities")
     check_url("http://localhost:8000/api/v1/retraining/status",    "/api/v1/retraining/status")

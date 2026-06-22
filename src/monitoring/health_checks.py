@@ -22,7 +22,7 @@ STALE_HOURS = 24
 
 def check_api_health(url: str = "http://localhost:8000/health") -> Dict[str, Any]:
     try:
-        with urllib.request.urlopen(url, timeout=5) as r:
+        with urllib.request.urlopen(url, timeout=3) as r:
             data = json.loads(r.read())
         return {"api_ok": True, **data}
     except Exception as e:

@@ -95,17 +95,26 @@ pipeline_runs_total = Counter(
 def initialise_gauges_from_reports():
     """Read local report files and seed gauge values at startup."""
     import json
+    import logging
     from pathlib import Path
     root = Path(__file__).resolve().parents[2]
 
-    # Model accuracy
+    # Model accuracy — key is "accuracy" in model_training_report.json
     model_report = root / "models" / "reports" / "model_training_report.json"
     if model_report.exists():
         try:
             d = json.loads(model_report.read_text())
-            model_accuracy_gauge.set(d.get("test_accuracy", 0.0))
-        except Exception:
-            pass
+            # Support both "accuracy" (Phase 01 key) and legacy "test_accuracy"
+            acc = d.get("accuracy") or d.get("test_accuracy")
+            if acc is not None and acc > 0:
+                model_accuracy_gauge.set(float(acc))
+            else:
+                logging.warning(
+                    "predictagoal_model_accuracy: accuracy key missing or zero "
+                    "in model_training_report.json — gauge not updated"
+                )
+        except Exception as exc:
+            logging.warning("initialise_gauges_from_reports: model accuracy read failed: %s", exc)
 
     # Drift level
     drift_map = {"none": 0, "low": 1, "medium": 2, "high": 3}
@@ -115,5 +124,13 @@ def initialise_gauges_from_reports():
             d = json.loads(drift_report.read_text())
             level = d.get("overall_drift_level", "none")
             drift_level_gauge.set(drift_map.get(level, 0))
-        except Exception:
-            pass
+        except Exception as exc:
+            logging.warning("initialise_gauges_from_reports: drift level read failed: %s", exc)
+
+    # Firestore availability — live check at startup
+    try:
+        from src.database.firebase_client import is_firebase_available
+        firestore_up.set(1.0 if is_firebase_available() else 0.0)
+    except Exception as exc:
+        logging.warning("initialise_gauges_from_reports: Firestore check failed: %s", exc)
+        firestore_up.set(0.0)

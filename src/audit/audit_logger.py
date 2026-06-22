@@ -8,12 +8,17 @@ The log file is append-only JSONL at data/audit/audit_log.jsonl.
 
 import hashlib
 import json
+import threading
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from src.audit.audit_schema import AuditEvent
+
+# In-process lock — prevents hash-chain corruption from concurrent writes
+# within the same Python process (e.g., startup + background threads).
+_WRITE_LOCK = threading.Lock()
 
 LOG_PATH = Path(__file__).resolve().parents[2] / "data" / "audit" / "audit_log.jsonl"
 
@@ -54,25 +59,26 @@ def append_event(
     """Write one immutable audit event. Returns the AuditEvent."""
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    now = datetime.now(timezone.utc).isoformat()
-    event_id = str(uuid.uuid4())
-    prev_hash = _get_last_hash()
-    h = _sha256(prev_hash, now, event_type, details)
+    with _WRITE_LOCK:
+        now = datetime.now(timezone.utc).isoformat()
+        event_id = str(uuid.uuid4())
+        prev_hash = _get_last_hash()
+        h = _sha256(prev_hash, now, event_type, details)
 
-    event = AuditEvent(
-        event_id=event_id,
-        timestamp=now,
-        event_type=event_type,
-        actor=actor,
-        phase=phase,
-        details=details,
-        hash=h,
-        previous_hash=prev_hash,
-        session_id=session_id,
-    )
+        event = AuditEvent(
+            event_id=event_id,
+            timestamp=now,
+            event_type=event_type,
+            actor=actor,
+            phase=phase,
+            details=details,
+            hash=h,
+            previous_hash=prev_hash,
+            session_id=session_id,
+        )
 
-    with open(LOG_PATH, "a", encoding="utf-8") as f:
-        f.write(json.dumps(event.to_dict(), default=str) + "\n")
+        with open(LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(event.to_dict(), default=str) + "\n")
 
     return event
 
