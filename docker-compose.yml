@@ -4,7 +4,7 @@ version: "3.9"
 # Usage: docker compose up --build
 # Ports:
 #   Backend FastAPI : 8000
-#   Frontend (nginx): 8080
+#   Frontend (nginx): 8082
 #   MLflow UI       : 5000
 #   Airflow UI      : 8081
 #   Prometheus      : 9090
@@ -31,6 +31,7 @@ services:
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
+      timeout: 5s
       retries: 5
 
   # ── FastAPI Backend ──────────────────────────────────────────
@@ -40,7 +41,8 @@ services:
       dockerfile: docker/backend.Dockerfile
     ports:
       - "8000:8000"
-    env_file: .env
+    env_file:
+      - .env
     volumes:
       - ./data:/app/data
       - ./models:/app/models
@@ -49,10 +51,11 @@ services:
       - postgres
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 30s
 
   # ── React Frontend ───────────────────────────────────────────
   frontend:
@@ -60,7 +63,7 @@ services:
       context: .
       dockerfile: docker/frontend.Dockerfile
     ports:
-      - "8080:80"
+      - "8082:80"
     depends_on:
       - backend
     restart: unless-stopped
@@ -68,15 +71,16 @@ services:
   # ── MLflow ──────────────────────────────────────────────────
   mlflow:
     image: python:3.11-slim
-    command: >
-      sh -c "pip install --quiet mlflow && mlflow server
-        --host 0.0.0.0 --port 5000
-        --backend-store-uri /mlruns
-        --default-artifact-root /mlruns"
     ports:
       - "5000:5000"
     volumes:
       - ./mlruns:/mlruns
+    environment:
+      MLFLOW_ALLOW_FILE_STORE: "true"
+    command:
+      - sh
+      - -c
+      - "python -m pip install --no-cache-dir 'mlflow==3.6.0' && mlflow ui --host 0.0.0.0 --port 5000 --backend-store-uri file:///mlruns --default-artifact-root file:///mlruns"
     restart: unless-stopped
 
   # ── Airflow Webserver ────────────────────────────────────────
