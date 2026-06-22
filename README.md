@@ -1,230 +1,230 @@
-# AI Football Match Prediction Agent — Phase 01
+# PredictaGoal — AI Football Match Prediction Agent
 
-A Python-first ML pipeline that predicts international football match outcomes
-(home win / draw / away win) using historical Kaggle data, scikit-learn, and
-optional Firebase Firestore storage.
+> Three-phase ML system: data pipeline + intelligence dashboard + production agent.
+> Predicts football match outcomes using historical data, Elo ratings, and ensemble ML.
 
 ---
 
-## What Phase 01 Implements
+## Architecture
 
-| Module | Description |
+```
+[Kaggle Dataset] -> [Preprocessing] -> [Feature Engineering] -> [RandomForest Model]
+                                                                        |
+[FastAPI Backend] <- [Prediction Engine] <- [MLflow Registry] <- [Retraining Decision]
+        |
+[React Dashboard] + [Agent Query] + [Prometheus /metrics]
+        |
+[Grafana Dashboards] + [Airflow DAGs] + [Firestore + Audit Trail]
+```
+
+---
+
+## Phase 01 — Core ML Pipeline
+
+| Feature | Detail |
 |---|---|
-| FR1 — Match Data Input | Downloads dataset via KaggleHub, inspects schema |
-| FR2 — Data Preprocessing | Cleans data, validates scores, creates outcome labels |
-| FR3 — Feature Engineering | Rolling form, goals avg, Elo rating, H2H stats (no leakage) |
-| FR4 — Basic Prediction Engine | Load model, generate features, return prediction + probabilities |
-| FR5 — Model Training | RandomForest, time-based split, accuracy + classification report |
-| FR8 — Results Storage | Firebase Firestore or local JSON fallback |
-| FR9 — Prototype Output | CLI scripts showing full system status and predictions |
+| Dataset | Kaggle `martj42/international-football-results-from-1872-to-2017` |
+| Rows after cleaning | 49,431 matches |
+| Model | RandomForest (200 trees, balanced weights, seed=42) |
+| Test accuracy | 56.8% (time-based split) |
+| Features | 14 leak-free signals (Elo, form, H2H, goals avg, venue) |
+| Storage | Firestore + local JSON fallback |
 
-## What is NOT in Phase 01
+## Phase 02 — Intelligence Dashboard
 
-- Frontend / dashboard (React, etc.)
-- SHAP / explainability
-- LLM-generated explanations
-- Drift detection
-- Advanced ensemble models
-- Multi-tournament orchestration
-- Alerts / notifications
+- Prediction Confidence Score (PCS) with tier labels
+- SHAP + RF-importance explanations with natural language
+- Contextual intelligence (dataset-available fields only)
+- PSI + KS-test drift detection
+- Bias/fairness reporting by outcome class
+- FastAPI REST backend + React/Vite/TailwindCSS/Recharts dashboard
 
----
+## Phase 03 — Production Agent
 
-## Folder Structure
-
-```
-football-match-predictions/
-├── data/
-│   ├── raw/                  # Raw CSV from Kaggle
-│   ├── processed/            # Cleaned CSV + features CSV
-│   └── reports/              # JSON quality/prediction reports
-├── models/
-│   ├── artifacts/            # Trained model (.joblib) + feature list
-│   └── reports/              # Training run reports
-├── logs/                     # Daily pipeline log files
-├── src/
-│   ├── config/settings.py    # Environment-based configuration
-│   ├── database/             # Firebase client + Firestore helpers + local fallback
-│   ├── ingestion/            # KaggleHub dataset download
-│   ├── preprocessing/        # Data cleaning and outcome labelling
-│   ├── features/             # Feature engineering (Elo, rolling form, H2H)
-│   ├── training/             # Model training and evaluation
-│   ├── prediction/           # Prediction engine
-│   └── utils/                # Logging and file helpers
-├── scripts/                  # Numbered CLI scripts (run in order)
-├── docs/                     # FRS document
-├── .env.example              # Environment variable template
-├── requirements.txt
-└── README.md
-```
+- Airflow DAGs: daily pipeline, retraining, and monitoring
+- MLflow experiment tracking + model versioning + registry
+- Real drift-triggered retraining decision logic (PSI >= 0.25 or HIGH drift)
+- Champion/Challenger model promotion rules
+- Conversational agent interface (14 intents, rule-based, optional LLM)
+- User preferences + alert system (local + Firestore, optional SMTP)
+- SHA-256 hash-chained immutable audit trail
+- Multi-source provider architecture (Kaggle, weather via Open-Meteo free, fixtures/injury optional)
+- Input validation + adversarial checks + rate limiting (FR18)
+- Prometheus metrics endpoint + Grafana dashboard provisioning
+- Docker Compose full-stack deployment
 
 ---
 
-## Python Environment Setup
+## Quick Start
+
+### 1. Environment Setup
 
 ```bash
-# 1. Create and activate a virtual environment
-python -m venv venv
+# Copy and fill in your credentials
+copy .env.example .env
 
-# Windows
-venv\Scripts\activate
+# Install Python dependencies
+python -m pip install -r requirements.txt
 
-# macOS / Linux
-source venv/bin/activate
-
-# 2. Install dependencies
-pip install -r requirements.txt
+# Install frontend dependencies
+cd frontend && npm install && cd ..
 ```
 
-**Python 3.9 or higher is recommended.**
-
----
-
-## Firebase Setup (Optional)
-
-Firebase is optional. The pipeline works without it using local JSON fallback.
-
-### Option A — Service Account JSON (recommended)
-
-1. Go to [Firebase Console](https://console.firebase.google.com/) → Project Settings → Service Accounts.
-2. Click **Generate new private key** → download the JSON file.
-3. Place it anywhere on your machine (e.g. `firebase_service_account.json`).
-4. Copy `.env.example` to `.env` and set:
-
-```env
-FIREBASE_SERVICE_ACCOUNT_PATH=C:/path/to/firebase_service_account.json
-```
-
-### Option B — Environment Variables
-
-Copy `.env.example` to `.env` and fill in:
-
-```env
-FIREBASE_PROJECT_ID=your-project-id
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
-FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n
-```
-
-> Note: Replace actual newlines in the private key with `\n` as a single line.
-
-### Firestore Rules (for testing)
-
-In Firebase Console → Firestore Database → Rules:
-
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true; // Change this before production
-    }
-  }
-}
-```
-
----
-
-## Kaggle Dataset Setup
-
-The dataset used is:  
-`martj42/international-football-results-from-1872-to-2017`
-
-### Authentication — New API Token Method (Recommended)
-
-This project supports the **new Kaggle API token format** (`KGAT_...`).  
-No `kaggle.json` file is required.
-
-1. Go to [kaggle.com/settings](https://www.kaggle.com/settings) → **API** → **Create New Token**
-2. Copy the token string (it starts with `KGAT_`)
-3. Add it to your `.env` file:
-
-```env
-KAGGLE_API_TOKEN=KGAT_your_token_here
-```
-
-The project reads this via `python-dotenv` and configures KaggleHub automatically.  
-The token is **never printed** in logs or output.
-
-### Authentication — Legacy Method (Fallback)
-
-If the new token doesn't work with your KaggleHub version:
-
-1. Go to [kaggle.com/settings](https://www.kaggle.com/settings) → **API** → **Create New Token**
-2. Download the `kaggle.json` file
-3. Place it at:
-   - Windows: `C:\Users\<user>\.kaggle\kaggle.json`
-   - Linux/Mac: `~/.kaggle/kaggle.json`
-
----
-
-## Run Order
-
-Run scripts in this exact order:
+### 2. Phase 01 — Core Pipeline
 
 ```bash
 python scripts/01_check_environment.py
-python scripts/02_setup_database.py
-python scripts/03_test_firebase.py
+python scripts/02_test_firebase.py
+python scripts/03_verify_kaggle.py
 python scripts/04_download_dataset.py
 python scripts/05_preprocess_data.py
 python scripts/06_generate_features.py
 python scripts/07_train_model.py
-python scripts/08_predict_sample.py
+python scripts/08_run_prediction.py
+```
+
+### 3. Phase 02 — Intelligence Reports
+
+```bash
+python scripts/09_generate_explanations.py
+python scripts/10_calculate_confidence.py
+python scripts/11_generate_drift_report.py
+python scripts/12_generate_bias_report.py
+python scripts/13_verify_phase02.py
+```
+
+### 4. Phase 03 — Production Setup
+
+```bash
+python scripts/14_run_airflow_pipeline_check.py
+python scripts/15_run_mlflow_check.py
+python scripts/16_run_monitoring_check.py
+python scripts/17_run_agent_query_check.py
+python scripts/18_run_phase03_verification.py
+```
+
+### 5. Run the System
+
+**Backend (FastAPI):**
+```bash
+python -m uvicorn src.api.main:app --reload
+# API docs:   http://localhost:8000/docs
+# Prometheus: http://localhost:8000/metrics
+```
+
+**Frontend (React):**
+```bash
+cd frontend && npm run dev
+# Dashboard: http://localhost:5173
+```
+
+**MLflow UI:**
+```bash
+mlflow ui --host 127.0.0.1 --port 5000
+```
+
+**Docker full-stack:**
+```bash
+docker compose up --build
+# Backend:    http://localhost:8000
+# Frontend:   http://localhost:8080
+# MLflow:     http://localhost:5000
+# Airflow:    http://localhost:8081   (admin/admin)
+# Prometheus: http://localhost:9090
+# Grafana:    http://localhost:3000   (admin/predictagoal)
+```
+
+**Airflow (requires apache-airflow):**
+```bash
+pip install apache-airflow
+set AIRFLOW_HOME=%cd%\airflow
+airflow standalone
 ```
 
 ---
 
-## Expected Outputs
+## .env Configuration
 
-After running all scripts:
+```env
+FIREBASE_SERVICE_ACCOUNT_PATH=secrets/firebase-service-account.json
+KAGGLE_API_TOKEN=your_kaggle_token
 
-| File | Description |
-|---|---|
-| `data/raw/matches_raw.csv` | Original dataset copy |
-| `data/processed/matches_processed.csv` | Cleaned dataset with outcome labels |
-| `data/processed/matches_features.csv` | Feature-engineered dataset |
-| `data/reports/dataset_summary.json` | Dataset schema summary |
-| `data/reports/data_quality_report.json` | Preprocessing quality metrics |
-| `data/reports/feature_engineering_report.json` | Feature generation summary |
-| `data/reports/sample_prediction.json` | Brazil vs Argentina prediction |
-| `models/artifacts/football_match_model.joblib` | Trained model |
-| `models/artifacts/feature_columns.json` | Feature column list |
-| `models/reports/model_training_report.json` | Accuracy + classification report |
-| `logs/YYYYMMDD_pipeline.log` | Full run log |
+# Optional Phase 03 providers
+FOOTBALL_API_KEY=
+WEATHER_API_KEY=
+INJURY_API_KEY=
 
----
+# Optional email alerts
+ENABLE_EMAIL_ALERTS=false
+SMTP_HOST=
+SMTP_USER=
+SMTP_PASSWORD=
 
-## Troubleshooting
-
-### `ModuleNotFoundError`
-Run `pip install -r requirements.txt`
-
-### `kagglehub` download fails
-- Ensure `~/.kaggle/kaggle.json` exists
-- Or set `KAGGLE_USERNAME` / `KAGGLE_KEY` in `.env`
-
-### Firebase connection fails
-- Check credentials are correct
-- Check Firestore is enabled in Firebase Console
-- The pipeline will continue with local fallback — no crash
-
-### `FileNotFoundError` on script N
-- Run the previous scripts in order first
-- Each script depends on the output of the one before it
-
-### Low model accuracy
-- This is expected for multi-class football prediction
-- Typical accuracy: 50–60% (football is inherently unpredictable)
-- Results are reported honestly without manipulation
+# Optional LLM agent
+OPENAI_API_KEY=
+ENABLE_LLM_AGENT=false
+```
 
 ---
 
-## Firestore Collections (Phase 01)
+## API Endpoints
 
-| Collection | Contents |
-|---|---|
-| `data_quality_reports` | Preprocessing quality metrics |
-| `model_runs` | Training run summaries |
-| `sample_predictions` | Individual match predictions |
-| `pipeline_logs` | Pipeline event logs |
-| `dataset_summaries` | Dataset schema metadata |
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/health` | System health + Firebase status |
+| GET | `/metrics` | Prometheus metrics |
+| GET | `/api/v1/summary` | Dataset + model summary |
+| GET | `/api/v1/predictions/sample` | Sample Brazil vs Argentina prediction |
+| POST | `/api/v1/predictions/custom` | Custom match prediction |
+| POST | `/api/v1/agent/query` | Conversational agent query |
+| GET | `/api/v1/agent/capabilities` | Supported agent intents |
+| GET | `/api/v1/system/status` | Full system health report |
+| GET | `/api/v1/providers/status` | External provider status |
+| GET | `/api/v1/retraining/status` | Retraining decision |
+| POST | `/api/v1/retraining/trigger` | Manual trigger (force=true required) |
+| GET | `/api/v1/model/version` | Current model version |
+| GET | `/api/v1/audit/recent` | Recent audit events |
+| GET | `/api/v1/alerts/recent` | Recent alerts |
+| POST | `/api/v1/preferences` | Save user preferences |
+| GET | `/api/v1/preferences/{user_id}` | Get user preferences |
+
+---
+
+## Security Notes
+
+- `.env` is gitignored — never committed
+- `secrets/` is gitignored — Firebase key stays local
+- Firebase Admin SDK never exposed to frontend
+- All external API keys optional
+- Input validation + injection sanitisation on all endpoints
+- Rate limiting on prediction and agent endpoints
+
+---
+
+## Known Limitations
+
+- Draw accuracy ~30% due to class imbalance
+- External providers (fixtures, injuries) require API keys not included
+- Weather uses Open-Meteo (free) but needs venue lat/lon not in dataset
+- Airflow installed separately (`pip install apache-airflow`)
+- Docker requires Docker Desktop on Windows
+- LLM agent requires `OPENAI_API_KEY` + `ENABLE_LLM_AGENT=true`
+- Model accuracy ceiling 55-70% — football has irreducible randomness
+
+---
+
+## Troubleshooting (Windows PowerShell)
+
+```powershell
+# Wrong pip version: always use
+python -m pip install <package>
+
+# Port 8000 in use:
+netstat -ano | findstr :8000
+
+# Firebase not found: check .env path matches actual file location
+```
+
+---
+
+*For analytical purposes only. Not financial or betting advice.*
