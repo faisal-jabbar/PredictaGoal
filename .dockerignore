@@ -1,0 +1,42 @@
+# Secrets — never bake into images
+.env
+secrets/
+*service_account*.json
+*firebase*.json
+
+# Data — mount as volumes
+data/raw/
+data/processed/
+data/audit/
+
+# Model binaries — mount as volumes
+models/artifacts/
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+venv/
+.venv/
+
+# MLflow
+mlruns/
+
+# Logs
+logs/
+*.log
+
+# Airflow local state
+airflow/logs/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

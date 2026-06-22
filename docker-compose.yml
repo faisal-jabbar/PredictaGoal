@@ -1,0 +1,179 @@
+version: "3.9"
+
+# PredictaGoal — Full-Stack Docker Compose
+# Usage: docker compose up --build
+# Ports:
+#   Backend FastAPI : 8000
+#   Frontend (nginx): 8080
+#   MLflow UI       : 5000
+#   Airflow UI      : 8081
+#   Prometheus      : 9090
+#   Grafana         : 3000
+
+x-airflow-env: &airflow-env
+  AIRFLOW__CORE__EXECUTOR: LocalExecutor
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+  AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+  PYTHONPATH: /opt/airflow
+
+services:
+
+  # ── Core infrastructure ──────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+
+  # ── FastAPI Backend ──────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── React Frontend ───────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── MLflow ──────────────────────────────────────────────────
+  mlflow:
+    image: python:3.11-slim
+    command: >
+      sh -c "pip install --quiet mlflow && mlflow server
+        --host 0.0.0.0 --port 5000
+        --backend-store-uri /mlruns
+        --default-artifact-root /mlruns"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlruns
+    restart: unless-stopped
+
+  # ── Airflow Webserver ────────────────────────────────────────
+  airflow-webserver:
+    build:
+      context: .
+      dockerfile: docker/airflow.Dockerfile
+    command: webserver
+    ports:
+      - "8081:8080"
+    environment:
+      <<: *airflow-env
+    env_file: .env
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./models:/opt/airflow/models
+      - ./logs:/opt/airflow/logs
+      - airflow_logs:/opt/airflow/airflow-logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ── Airflow Scheduler ────────────────────────────────────────
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: docker/airflow.Dockerfile
+    command: scheduler
+    environment:
+      <<: *airflow-env
+    env_file: .env
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./models:/opt/airflow/models
+      - airflow_logs:/opt/airflow/airflow-logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Airflow Init ─────────────────────────────────────────────
+  airflow-init:
+    build:
+      context: .
+      dockerfile: docker/airflow.Dockerfile
+    command: >
+      bash -c "airflow db init &&
+               airflow users create
+                 --username admin --password admin
+                 --firstname Admin --lastname Admin
+                 --role Admin --email admin@predictagoal.local"
+    environment:
+      <<: *airflow-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Prometheus ───────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    restart: unless-stopped
+
+  # ── Grafana ──────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: predictagoal
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+  airflow_logs:
