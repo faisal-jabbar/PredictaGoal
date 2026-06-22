@@ -1,0 +1,15 @@
+{
+  "home_team": "Brazil",
+  "away_team": "Argentina",
+  "match_date": "2017-06-01",
+  "tournament": "FIFA World Cup qualification",
+  "neutral_venue": false,
+  "prediction": "home_win",
+  "probabilities": {
+    "home_win": 0.427,
+    "draw": 0.3374,
+    "away_win": 0.2355
+  },
+  "confidence": 0.427,
+  "predicted_at": "2026-06-22T15:01:44.256019"
+}

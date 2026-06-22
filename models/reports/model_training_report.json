@@ -1,0 +1,80 @@
+{
+  "run_id": "20260622_145946",
+  "model_type": "RandomForestClassifier",
+  "train_size": 39544,
+  "test_size": 9887,
+  "accuracy": 0.5678163244664711,
+  "classification_report": {
+    "home_win": {
+      "precision": 0.7024152448482163,
+      "recall": 0.6724649978786593,
+      "f1-score": 0.6871139048444782,
+      "support": 4714.0
+    },
+    "draw": {
+      "precision": 0.30510694020078566,
+      "recall": 0.30325379609544467,
+      "f1-score": 0.304177545691906,
+      "support": 2305.0
+    },
+    "away_win": {
+      "precision": 0.5660071359065845,
+      "recall": 0.6084379358437936,
+      "f1-score": 0.5864560578054109,
+      "support": 2868.0
+    },
+    "accuracy": 0.5678163244664711,
+    "macro avg": {
+      "precision": 0.5245097736518621,
+      "recall": 0.5280522432726326,
+      "f1-score": 0.5259158361139317,
+      "support": 9887.0
+    },
+    "weighted avg": {
+      "precision": 0.5702200290439351,
+      "recall": 0.5678163244664711,
+      "f1-score": 0.568639644385823,
+      "support": 9887.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      3170,
+      947,
+      597
+    ],
+    [
+      865,
+      699,
+      741
+    ],
+    [
+      478,
+      645,
+      1745
+    ]
+  ],
+  "label_order": [
+    "home_win",
+    "draw",
+    "away_win"
+  ],
+  "feature_columns": [
+    "home_form",
+    "away_form",
+    "home_goals_scored_avg",
+    "home_goals_conceded_avg",
+    "away_goals_scored_avg",
+    "away_goals_conceded_avg",
+    "h2h_home_wins",
+    "h2h_draws",
+    "h2h_away_wins",
+    "home_advantage",
+    "neutral_venue",
+    "home_elo",
+    "away_elo",
+    "elo_diff"
+  ],
+  "model_path": "D:\\Ai Agents\\Football match preditions\\models\\artifacts\\football_match_model.joblib",
+  "trained_at": "2026-06-22T14:59:46.035081"
+}

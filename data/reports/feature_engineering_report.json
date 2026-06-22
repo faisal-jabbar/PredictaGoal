@@ -1,0 +1,23 @@
+{
+  "input_rows": 49431,
+  "output_rows": 49431,
+  "feature_columns": [
+    "home_form",
+    "away_form",
+    "home_goals_scored_avg",
+    "home_goals_conceded_avg",
+    "away_goals_scored_avg",
+    "away_goals_conceded_avg",
+    "h2h_home_wins",
+    "h2h_draws",
+    "h2h_away_wins",
+    "home_advantage",
+    "neutral_venue",
+    "home_elo",
+    "away_elo",
+    "elo_diff"
+  ],
+  "rolling_window": 5,
+  "output_file": "D:\\Ai Agents\\Football match preditions\\data\\processed\\matches_features.csv",
+  "generated_at": "2026-06-22T14:59:40.791789"
+}

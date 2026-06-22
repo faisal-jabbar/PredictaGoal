@@ -1,0 +1,30 @@
+{
+  "total_rows_loaded": 49477,
+  "rows_removed": 46,
+  "final_usable_rows": 49431,
+  "missing_value_summary": {
+    "date": 0,
+    "home_team": 0,
+    "away_team": 0,
+    "home_score": 0,
+    "away_score": 0,
+    "tournament": 0,
+    "city": 0,
+    "country": 0,
+    "neutral": 0,
+    "outcome": 0
+  },
+  "date_range": {
+    "from": "1872-11-30",
+    "to": "2026-06-18"
+  },
+  "unique_teams": 336,
+  "unique_tournaments": 200,
+  "outcome_distribution": {
+    "home_win": 24226,
+    "away_win": 13962,
+    "draw": 11243
+  },
+  "output_file": "D:\\Ai Agents\\Football match preditions\\data\\processed\\matches_processed.csv",
+  "generated_at": "2026-06-22T14:59:27.648338"
+}

@@ -1,0 +1,45 @@
+{
+  "source_file": "results.csv",
+  "shape": {
+    "rows": 49477,
+    "columns": 9
+  },
+  "columns": [
+    "date",
+    "home_team",
+    "away_team",
+    "home_score",
+    "away_score",
+    "tournament",
+    "city",
+    "country",
+    "neutral"
+  ],
+  "dtypes": {
+    "date": "object",
+    "home_team": "object",
+    "away_team": "object",
+    "home_score": "float64",
+    "away_score": "float64",
+    "tournament": "object",
+    "city": "object",
+    "country": "object",
+    "neutral": "bool"
+  },
+  "null_counts": {
+    "date": 0,
+    "home_team": 0,
+    "away_team": 0,
+    "home_score": 44,
+    "away_score": 44,
+    "tournament": 0,
+    "city": 0,
+    "country": 0,
+    "neutral": 0
+  },
+  "date_range": {
+    "from": "1872-11-30",
+    "to": "2026-06-27"
+  },
+  "generated_at": "2026-06-22T14:59:21.027308"
+}
