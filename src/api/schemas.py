@@ -6,8 +6,8 @@ from pydantic import BaseModel
 class HealthResponse(BaseModel):
     status: str
     firebase: str
-    version: str = "2.0.0"
-    phase: str = "Phase 02"
+    version: str = "3.0.0"
+    phase: str = "Phase 03"
 
 
 class SummaryResponse(BaseModel):
