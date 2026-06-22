@@ -1,0 +1,108 @@
+{
+  "__inputs": [],
+  "__requires": [
+    {"type": "grafana", "id": "grafana", "name": "Grafana", "version": "9.0.0"},
+    {"type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0"}
+  ],
+  "annotations": {"list": []},
+  "description": "PredictaGoal — AI Football Prediction Agent Production Dashboard",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "type": "stat",
+      "title": "API Health",
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0},
+      "targets": [{"expr": "up{job=\"predictagoal_backend\"}", "legendFormat": "API", "datasource": "Prometheus"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background"},
+      "fieldConfig": {"defaults": {"thresholds": {"steps": [{"color": "red", "value": 0}, {"color": "green", "value": 1}]}}}
+    },
+    {
+      "type": "stat",
+      "title": "Model Accuracy",
+      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0},
+      "targets": [{"expr": "predictagoal_model_accuracy", "legendFormat": "Accuracy", "datasource": "Prometheus"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background"},
+      "fieldConfig": {"defaults": {"unit": "percentunit", "thresholds": {"steps": [{"color": "red", "value": 0}, {"color": "yellow", "value": 0.50}, {"color": "green", "value": 0.55}]}}}
+    },
+    {
+      "type": "stat",
+      "title": "Drift Level",
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0},
+      "targets": [{"expr": "predictagoal_drift_level", "legendFormat": "Drift", "datasource": "Prometheus"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background"},
+      "fieldConfig": {"defaults": {"thresholds": {"steps": [{"color": "green", "value": 0}, {"color": "yellow", "value": 1}, {"color": "orange", "value": 2}, {"color": "red", "value": 3}]}}}
+    },
+    {
+      "type": "stat",
+      "title": "Firestore Status",
+      "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0},
+      "targets": [{"expr": "predictagoal_firestore_up", "legendFormat": "Firestore", "datasource": "Prometheus"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background"},
+      "fieldConfig": {"defaults": {"thresholds": {"steps": [{"color": "red", "value": 0}, {"color": "green", "value": 1}]}}}
+    },
+    {
+      "type": "stat",
+      "title": "Stale Reports",
+      "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0},
+      "targets": [{"expr": "predictagoal_stale_reports_count", "legendFormat": "Stale", "datasource": "Prometheus"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background"},
+      "fieldConfig": {"defaults": {"thresholds": {"steps": [{"color": "green", "value": 0}, {"color": "yellow", "value": 1}, {"color": "red", "value": 3}]}}}
+    },
+    {
+      "type": "timeseries",
+      "title": "Prediction Requests",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "targets": [
+        {"expr": "rate(predictagoal_prediction_requests_total[5m])", "legendFormat": "{{endpoint}}", "datasource": "Prometheus"},
+        {"expr": "rate(predictagoal_prediction_failures_total[5m])", "legendFormat": "failures/{{reason}}", "datasource": "Prometheus"}
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Agent Queries by Intent",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "targets": [{"expr": "rate(predictagoal_agent_queries_total[5m])", "legendFormat": "{{intent}}", "datasource": "Prometheus"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Prediction Latency (p50/p95)",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+      "targets": [
+        {"expr": "histogram_quantile(0.50, rate(predictagoal_prediction_latency_seconds_bucket[5m]))", "legendFormat": "p50", "datasource": "Prometheus"},
+        {"expr": "histogram_quantile(0.95, rate(predictagoal_prediction_latency_seconds_bucket[5m]))", "legendFormat": "p95", "datasource": "Prometheus"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "s"}}
+    },
+    {
+      "type": "timeseries",
+      "title": "Retraining Decisions & Promotions",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+      "targets": [
+        {"expr": "increase(predictagoal_retraining_decisions_total[1h])", "legendFormat": "decisions/{{decision}}", "datasource": "Prometheus"},
+        {"expr": "increase(predictagoal_model_promotions_total[1h])", "legendFormat": "promotions", "datasource": "Prometheus"}
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Alert Events",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+      "targets": [{"expr": "increase(predictagoal_alert_events_total[1h])", "legendFormat": "{{alert_type}}", "datasource": "Prometheus"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Pipeline Runs",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+      "targets": [{"expr": "increase(predictagoal_pipeline_runs_total[1h])", "legendFormat": "{{pipeline}}/{{status}}", "datasource": "Prometheus"}]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 37,
+  "tags": ["predictagoal", "football", "mlops"],
+  "title": "PredictaGoal Production",
+  "uid": "predictagoal-prod-v3",
+  "version": 1
+}
