@@ -1,0 +1,28 @@
+{
+  "model_version": "v2026.06.22.1704",
+  "created_at": "2026-06-22T17:04:13.518020+00:00",
+  "git_commit": "30535f6",
+  "model_type": "RandomForestClassifier",
+  "accuracy": 0.0,
+  "draw_f1": 0.3033,
+  "feature_columns": [
+    "home_form",
+    "away_form",
+    "home_goals_scored_avg",
+    "home_goals_conceded_avg",
+    "away_goals_scored_avg",
+    "away_goals_conceded_avg",
+    "h2h_home_wins",
+    "h2h_draws",
+    "h2h_away_wins",
+    "home_advantage",
+    "neutral_venue",
+    "home_elo",
+    "away_elo",
+    "elo_diff"
+  ],
+  "artifact_path": "D:\\Ai Agents\\Football match preditions\\models\\artifacts\\football_match_model.joblib",
+  "status": "active",
+  "promoted": true,
+  "mlflow_run_id": "f2f96dbd619e40c9a3907ac68ea9cdc4"
+}

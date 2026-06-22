@@ -1,0 +1,17 @@
+{
+  "should_retrain": true,
+  "reasons": [
+    "overall_drift_level=high",
+    "max_psi=0.2567 >= 0.25"
+  ],
+  "overall_drift_level": "high",
+  "max_psi": 0.2567,
+  "drifted_features": [
+    "home_elo",
+    "away_elo"
+  ],
+  "force_requested": false,
+  "current_model_accuracy": null,
+  "evaluated_at": "2026-06-22T17:06:45.333108+00:00",
+  "status": "retrain_needed"
+}

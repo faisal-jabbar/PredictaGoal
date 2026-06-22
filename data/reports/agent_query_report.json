@@ -1,0 +1,27 @@
+{
+  "answer": "The latest sample prediction is Home Win for Brazil vs Argentina (date: 2017-06-01, tournament: FIFA World Cup qualification). Probabilities \u2014 Home Win: 42.7%, Draw: 33.7%, Away Win: 23.5%.",
+  "sources": [
+    "sample_prediction.json"
+  ],
+  "status": "ok",
+  "data": {
+    "home_team": "Brazil",
+    "away_team": "Argentina",
+    "match_date": "2017-06-01",
+    "tournament": "FIFA World Cup qualification",
+    "neutral_venue": false,
+    "prediction": "home_win",
+    "probabilities": {
+      "home_win": 0.427,
+      "draw": 0.3374,
+      "away_win": 0.2355
+    },
+    "confidence": 0.427,
+    "predicted_at": "2026-06-22T15:23:34.584265"
+  },
+  "intent": "latest_prediction",
+  "intent_confidence": 0.67,
+  "query": "What is the latest prediction?",
+  "session_id": "d002752a-f6ba-4154-80ba-f5fd196513bd",
+  "timestamp": "2026-06-22T17:12:25.142688+00:00"
+}

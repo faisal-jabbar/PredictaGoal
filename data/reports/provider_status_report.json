@@ -1,0 +1,24 @@
+{
+  "providers": {
+    "kaggle": {
+      "provider": "kaggle",
+      "status": "ok"
+    },
+    "fixtures": {
+      "provider": "fixtures",
+      "status": "disabled",
+      "reason": "FIXTURES_API_KEY not configured"
+    },
+    "weather": {
+      "provider": "weather",
+      "status": "ok",
+      "source": "open-meteo (free)"
+    },
+    "injury": {
+      "provider": "injury",
+      "status": "disabled",
+      "reason": "INJURY_API_KEY not configured"
+    }
+  },
+  "generated_at": "2026-06-22T17:12:09.976309+00:00"
+}

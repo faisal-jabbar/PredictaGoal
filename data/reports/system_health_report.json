@@ -1,0 +1,39 @@
+{
+  "overall": "healthy",
+  "api_ok": true,
+  "firestore_ok": true,
+  "model_ok": true,
+  "stale_reports": 0,
+  "details": {
+    "api": {
+      "api_ok": true,
+      "status": "ok",
+      "firebase": "connected",
+      "version": "3.0.0",
+      "phase": "Phase 03"
+    },
+    "reports": {
+      "fresh": [
+        "data/reports/confidence_report.json",
+        "data/reports/explanation_report.json",
+        "data/reports/drift_report.json",
+        "data/reports/bias_report.json",
+        "data/reports/contextual_report.json"
+      ],
+      "stale": [],
+      "missing": [],
+      "stale_count": 0,
+      "checked_at": "2026-06-22T17:12:05.342637+00:00"
+    },
+    "model": {
+      "exists": true,
+      "path": "D:\\Ai Agents\\Football match preditions\\models\\artifacts\\football_match_model.joblib",
+      "size_bytes": 21060305
+    },
+    "firestore": {
+      "firestore_ok": true
+    },
+    "checked_at": "2026-06-22T17:12:06.135921+00:00"
+  },
+  "generated_at": "2026-06-22T17:12:06.135921+00:00"
+}
