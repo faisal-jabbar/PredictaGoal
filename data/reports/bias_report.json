@@ -1,0 +1,60 @@
+{
+  "overall_accuracy": 0.5678,
+  "test_set_size": 9887,
+  "accuracy_by_class": {
+    "home_win": 0.6725,
+    "draw": 0.3033,
+    "away_win": 0.6084
+  },
+  "prediction_distribution": {
+    "home_win": 0.4565,
+    "draw": 0.2317,
+    "away_win": 0.3118
+  },
+  "actual_distribution": {
+    "home_win": 0.4768,
+    "draw": 0.2331,
+    "away_win": 0.2901
+  },
+  "accuracy_by_venue": {
+    "neutral": 0.5421,
+    "home_ground": 0.5796
+  },
+  "accuracy_by_tournament": {
+    "Friendly": {
+      "accuracy": 0.5318,
+      "sample_size": 2815
+    },
+    "FIFA World Cup qualification": {
+      "accuracy": 0.6156,
+      "sample_size": 2315
+    },
+    "African Cup of Nations qualification": {
+      "accuracy": 0.5455,
+      "sample_size": 671
+    },
+    "UEFA Nations League": {
+      "accuracy": 0.4954,
+      "sample_size": 658
+    },
+    "UEFA Euro qualification": {
+      "accuracy": 0.6966,
+      "sample_size": 501
+    },
+    "CONCACAF Nations League": {
+      "accuracy": 0.5877,
+      "sample_size": 422
+    },
+    "African Cup of Nations": {
+      "accuracy": 0.4625,
+      "sample_size": 240
+    },
+    "AFC Asian Cup qualification": {
+      "accuracy": 0.7158,
+      "sample_size": 190
+    }
+  },
+  "known_issue": "Draw recall is 30.3%, which is substantially below home_win (67.2%). This is a known challenge in football prediction \u2014 draws are inherently difficult to predict because they often result from evenly matched teams or defensive play patterns not captured by aggregate statistics.",
+  "fairness_notes": "The Kaggle international football results dataset does not include demographic attributes. Bias analysis is limited to football-specific groupings: outcome class, tournament type, and venue. No claims are made about demographic fairness.",
+  "generated_at": "2026-06-22T15:34:58.003861"
+}
