@@ -1,0 +1,47 @@
+{
+  "match": "Brazil vs Argentina",
+  "home_team": "Brazil",
+  "away_team": "Argentina",
+  "match_date": "2017-06-01",
+  "available_context": {
+    "tournament": "FIFA World Cup qualification",
+    "tournament_type": "world_cup",
+    "venue_type": "home_ground",
+    "neutral_venue": false,
+    "season_context": {
+      "month": 6,
+      "season_type": "peak_season"
+    },
+    "rivalry_match": true
+  },
+  "unavailable_context": {
+    "weather": {
+      "value": null,
+      "status": "requires_external_api_or_location_coordinates",
+      "note": "Planned Phase 03 integration via weather API + venue coordinates."
+    },
+    "referee_tendency": {
+      "value": null,
+      "status": "not_available_in_dataset",
+      "note": "Referee data is not present in the Kaggle international results dataset."
+    },
+    "injury_suspension_impact": {
+      "value": null,
+      "status": "requires_external_injury_feed",
+      "note": "Planned Phase 03 integration via official squad announcement feed."
+    },
+    "crowd_attendance": {
+      "value": null,
+      "status": "not_available_in_dataset",
+      "note": "Attendance data is not included in the current dataset."
+    },
+    "transfer_window_recency": {
+      "value": null,
+      "status": "requires_squad_data",
+      "note": "Transfer impact analysis requires squad composition data."
+    }
+  },
+  "context_coverage_pct": 54.5,
+  "generated_at": "2026-06-22T15:35:41.553821",
+  "notes": "Context availability is determined by what fields exist in the Kaggle international football results dataset. Unavailable fields represent planned integrations, not application errors."
+}

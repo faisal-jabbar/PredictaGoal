@@ -1,0 +1,83 @@
+{
+  "match": "Brazil vs Argentina",
+  "match_date": "2017-06-01",
+  "prediction": "home_win",
+  "probabilities": {
+    "home_win": 0.427,
+    "draw": 0.3374,
+    "away_win": 0.2355
+  },
+  "confidence_tier": "LOW",
+  "method": "rf_feature_importance",
+  "shap_available": true,
+  "top_features": [
+    {
+      "feature": "elo_diff",
+      "importance": 0.3334,
+      "feature_value": 101.8144,
+      "display_name": "Elo Difference",
+      "direction": "supports_home_win",
+      "shap_value": null
+    },
+    {
+      "feature": "away_elo",
+      "importance": 0.1418,
+      "feature_value": 1645.788,
+      "display_name": "Away Team Elo",
+      "direction": "supports_away_win",
+      "shap_value": null
+    },
+    {
+      "feature": "home_elo",
+      "importance": 0.1305,
+      "feature_value": 1747.6024,
+      "display_name": "Home Team Elo",
+      "direction": "supports_home_win",
+      "shap_value": null
+    },
+    {
+      "feature": "home_goals_conceded_avg",
+      "importance": 0.0636,
+      "feature_value": 0.2,
+      "display_name": "Home Goals Conceded (avg)",
+      "direction": "contextual",
+      "shap_value": null
+    },
+    {
+      "feature": "away_goals_conceded_avg",
+      "importance": 0.0602,
+      "feature_value": 1.2,
+      "display_name": "Away Goals Conceded (avg)",
+      "direction": "contextual",
+      "shap_value": null
+    },
+    {
+      "feature": "away_goals_scored_avg",
+      "importance": 0.0399,
+      "feature_value": 0.8,
+      "display_name": "Away Goals Scored (avg)",
+      "direction": "supports_away_win",
+      "shap_value": null
+    },
+    {
+      "feature": "home_goals_scored_avg",
+      "importance": 0.0387,
+      "feature_value": 2.6,
+      "display_name": "Home Goals Scored (avg)",
+      "direction": "supports_home_win",
+      "shap_value": null
+    },
+    {
+      "feature": "home_form",
+      "importance": 0.0379,
+      "feature_value": 1.0,
+      "display_name": "Home Team Form",
+      "direction": "supports_home_win",
+      "shap_value": null
+    }
+  ],
+  "explanation_text": "The model predicts a Home Win based primarily on a meaningful Elo rating advantage for Brazil (Elo diff: 102). Confidence is low (leading probability: 42.7%). The outcome probabilities are close \u2014 no single result dominates strongly. This prediction is based on historical statistics and should be treated as an analytical estimate, not a certainty.",
+  "rule_based_text": "The model predicts a Home Win based primarily on a meaningful Elo rating advantage for Brazil (Elo diff: 102). Confidence is low (leading probability: 42.7%). The outcome probabilities are close \u2014 no single result dominates strongly. This prediction is based on historical statistics and should be treated as an analytical estimate, not a certainty.",
+  "llm_enhanced": false,
+  "generated_at": "2026-06-22T15:33:48.375625"
+}

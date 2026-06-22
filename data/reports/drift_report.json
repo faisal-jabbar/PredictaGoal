@@ -1,0 +1,164 @@
+{
+  "baseline_period": {
+    "from": "1872-11-30",
+    "to": "2016-03-25",
+    "rows": 39544
+  },
+  "recent_period": {
+    "from": "2016-03-25",
+    "to": "2026-06-18",
+    "rows": 9887
+  },
+  "features_checked": 14,
+  "drifted_features": [
+    "home_elo",
+    "away_elo"
+  ],
+  "drifted_count": 2,
+  "overall_drift_level": "high",
+  "max_psi": 0.2567,
+  "feature_details": [
+    {
+      "feature": "home_form",
+      "psi": 0.0071,
+      "drift_level": "none",
+      "ks_statistic": 0.0168,
+      "ks_p_value": 0.0226,
+      "baseline_mean": 0.5026,
+      "recent_mean": 0.5089,
+      "mean_shift": 0.0063
+    },
+    {
+      "feature": "away_form",
+      "psi": 0.0028,
+      "drift_level": "none",
+      "ks_statistic": 0.0122,
+      "ks_p_value": 0.1915,
+      "baseline_mean": 0.4961,
+      "recent_mean": 0.4924,
+      "mean_shift": -0.0037
+    },
+    {
+      "feature": "home_goals_scored_avg",
+      "psi": 0.0139,
+      "drift_level": "none",
+      "ks_statistic": 0.0487,
+      "ks_p_value": 0.0,
+      "baseline_mean": 1.5047,
+      "recent_mean": 1.3891,
+      "mean_shift": -0.1157
+    },
+    {
+      "feature": "home_goals_conceded_avg",
+      "psi": 0.019,
+      "drift_level": "none",
+      "ks_statistic": 0.0586,
+      "ks_p_value": 0.0,
+      "baseline_mean": 1.4784,
+      "recent_mean": 1.3384,
+      "mean_shift": -0.14
+    },
+    {
+      "feature": "away_goals_scored_avg",
+      "psi": 0.0198,
+      "drift_level": "none",
+      "ks_statistic": 0.0595,
+      "ks_p_value": 0.0,
+      "baseline_mean": 1.4784,
+      "recent_mean": 1.3423,
+      "mean_shift": -0.1361
+    },
+    {
+      "feature": "away_goals_conceded_avg",
+      "psi": 0.0123,
+      "drift_level": "none",
+      "ks_statistic": 0.0485,
+      "ks_p_value": 0.0,
+      "baseline_mean": 1.5157,
+      "recent_mean": 1.3889,
+      "mean_shift": -0.1268
+    },
+    {
+      "feature": "h2h_home_wins",
+      "psi": 0.0111,
+      "drift_level": "none",
+      "ks_statistic": 0.0593,
+      "ks_p_value": 0.0,
+      "baseline_mean": 5.4516,
+      "recent_mean": 5.8319,
+      "mean_shift": 0.3803
+    },
+    {
+      "feature": "h2h_draws",
+      "psi": 0.0141,
+      "drift_level": "none",
+      "ks_statistic": 0.0652,
+      "ks_p_value": 0.0,
+      "baseline_mean": 2.3371,
+      "recent_mean": 2.857,
+      "mean_shift": 0.5198
+    },
+    {
+      "feature": "h2h_away_wins",
+      "psi": 0.0175,
+      "drift_level": "none",
+      "ks_statistic": 0.0694,
+      "ks_p_value": 0.0,
+      "baseline_mean": 3.0575,
+      "recent_mean": 3.1722,
+      "mean_shift": 0.1148
+    },
+    {
+      "feature": "home_advantage",
+      "psi": 0.0186,
+      "drift_level": "none",
+      "ks_statistic": 0.0613,
+      "ks_p_value": 0.0,
+      "baseline_mean": 0.7476,
+      "recent_mean": 0.6864,
+      "mean_shift": -0.0613
+    },
+    {
+      "feature": "neutral_venue",
+      "psi": 0.0186,
+      "drift_level": "none",
+      "ks_statistic": 0.0613,
+      "ks_p_value": 0.0,
+      "baseline_mean": 0.2524,
+      "recent_mean": 0.3136,
+      "mean_shift": 0.0613
+    },
+    {
+      "feature": "home_elo",
+      "psi": 0.2567,
+      "drift_level": "high",
+      "ks_statistic": 0.1288,
+      "ks_p_value": 0.0,
+      "baseline_mean": 1563.5885,
+      "recent_mean": 1580.5226,
+      "mean_shift": 16.9341
+    },
+    {
+      "feature": "away_elo",
+      "psi": 0.2113,
+      "drift_level": "medium",
+      "ks_statistic": 0.0954,
+      "ks_p_value": 0.0,
+      "baseline_mean": 1556.8241,
+      "recent_mean": 1556.1132,
+      "mean_shift": -0.7108
+    },
+    {
+      "feature": "elo_diff",
+      "psi": 0.0664,
+      "drift_level": "none",
+      "ks_statistic": 0.0762,
+      "ks_p_value": 0.0,
+      "baseline_mean": 6.7644,
+      "recent_mean": 24.4094,
+      "mean_shift": 17.6449
+    }
+  ],
+  "notes": "This is a Phase 02 drift detection report using PSI and KS-test. Auto-retraining on detected drift is a Phase 03 feature.",
+  "generated_at": "2026-06-22T15:34:34.390606"
+}
