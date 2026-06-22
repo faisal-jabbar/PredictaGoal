@@ -45,16 +45,19 @@ export default function PredictionCard({ prediction }) {
             {confidence_tier} Confidence
           </span>
         )}
-        <span className="badge-slate">{(confidence * 100).toFixed(1)}% leading</span>
+        <span className="badge-slate" title="Highest single-outcome probability from the model">
+          Leading Probability: {(confidence * 100).toFixed(1)}%
+        </span>
       </div>
 
       <ProbabilityBars probabilities={probabilities} />
 
-      {confidence_note && (
-        <p className="mt-4 text-xs text-slate-500 border-t border-slate-700/50 pt-3 leading-relaxed">
-          {confidence_note}
-        </p>
-      )}
+      <p className="mt-4 text-xs text-slate-500 border-t border-slate-700/50 pt-3 leading-relaxed">
+        The <strong className="text-slate-400">Leading Probability</strong> is the raw model probability for the top outcome.
+        The <strong className="text-slate-400">Prediction Confidence Score (PCS)</strong> shown in the panel to the right
+        measures how decisive the gap is between outcomes — it is lower when all three probabilities are close together.
+        {confidence_note && <><br /><span className="mt-1 block">{confidence_note}</span></>}
+      </p>
 
       <div className="flex gap-4 mt-4 text-xs text-slate-600">
         {match_date && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{match_date}</span>}

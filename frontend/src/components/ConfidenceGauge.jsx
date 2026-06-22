@@ -16,7 +16,13 @@ export default function ConfidenceGauge({ data }) {
 
   return (
     <div className="card">
-      <h2 className="section-title"><ShieldCheck className="w-5 h-5 text-blue-400" />Prediction Confidence</h2>
+      <div className="flex items-start justify-between mb-1">
+        <h2 className="section-title mb-0"><ShieldCheck className="w-5 h-5 text-blue-400" />Prediction Confidence Score (PCS)</h2>
+      </div>
+      <p className="text-xs text-slate-600 mb-4">
+        PCS measures decisiveness — how far the top probability is from a random guess across 3 outcomes.
+        A leading probability of 42–44% still yields low PCS when the other outcomes are nearly as likely.
+      </p>
 
       <div className="flex items-center gap-5 mb-5">
         <div className="relative w-24 h-24 flex-shrink-0">
@@ -28,6 +34,7 @@ export default function ConfidenceGauge({ data }) {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className={`text-xl font-bold ${cfg.color}`}>{pct}%</span>
+            <span className="text-[9px] text-slate-500 mt-0.5">PCS</span>
           </div>
         </div>
 
@@ -42,11 +49,11 @@ export default function ConfidenceGauge({ data }) {
 
       <div className="grid grid-cols-3 gap-3 mt-2">
         {[
-          { label: 'Margin Score', val: d.margin_score?.toFixed(3) },
-          { label: 'Top-2 Gap',    val: d.top2_margin?.toFixed(3) },
-          { label: 'Entropy',      val: d.entropy?.toFixed(3) },
-        ].map(({ label, val }) => (
-          <div key={label} className="card-sm text-center">
+          { label: 'Margin Score', val: d.margin_score?.toFixed(3), tip: 'Distance from uniform baseline (1/3 per class)' },
+          { label: 'Top-2 Gap',   val: d.top2_margin?.toFixed(3),  tip: 'Gap between highest and second-highest probability' },
+          { label: 'Entropy',     val: d.entropy?.toFixed(3),      tip: 'Uncertainty measure — lower = more decisive' },
+        ].map(({ label, val, tip }) => (
+          <div key={label} className="card-sm text-center" title={tip}>
             <p className="label mb-1">{label}</p>
             <p className="font-mono text-sm text-slate-200">{val ?? '—'}</p>
           </div>

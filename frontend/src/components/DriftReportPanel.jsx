@@ -59,11 +59,24 @@ export default function DriftReportPanel({ data }) {
       )}
 
       {d.drifted_features?.length > 0 && (
-        <p className="text-xs text-amber-400 mt-3 flex items-center gap-1">
-          <AlertTriangle className="w-3 h-3" /> Drifted: {d.drifted_features.join(', ')}
+        <p className="text-xs text-amber-400 mt-3 flex items-center gap-1 flex-wrap">
+          <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+          Drifted features: {d.drifted_features.join(', ')}
         </p>
       )}
-      <p className="mt-3 text-xs text-slate-600 border-t border-slate-700/50 pt-3">{d.notes}</p>
+
+      {d.overall_drift_level === 'high' && (
+        <div className="mt-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+          <p className="text-xs text-amber-300 leading-relaxed">
+            <strong>What HIGH drift means:</strong> Recent feature distributions differ noticeably from the
+            historical baseline (PSI &gt; 0.25). This does not automatically mean the model is wrong —
+            it means the data environment has shifted and model performance should be monitored closely.
+            Automated retraining is planned for Phase 03.
+          </p>
+        </div>
+      )}
+
+      <p className="mt-3 text-xs text-slate-600 border-t border-slate-700/50 pt-3 leading-relaxed">{d.notes}</p>
     </div>
   )
 }

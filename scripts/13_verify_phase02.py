@@ -45,7 +45,7 @@ def check_api():
         import urllib.request
         with urllib.request.urlopen("http://localhost:8000/health", timeout=5) as r:
             body = json.loads(r.read())
-        print(f"  {PASS} /health  →  {body}")
+        print(f"  {PASS} /health  ->  {body}")
         return True
     except Exception as e:
         print(f"  {FAIL} Backend unreachable: {e}")
